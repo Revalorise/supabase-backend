@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from supabase_connect import fetch_all_data, get_filtered_data
+from supabase_connect import fetch_all_data, get_filtered_data, fetch_all_data_v2
 
 app = Flask(__name__)
 # flask --app app run --debug
@@ -35,9 +35,71 @@ def filtered_data_page():
     return render_template('home.html', data=data, fields=fields)
 """
 
-@app.route('/test')
+test_data = [
+    {"name": "Alice", "category": "A", "age": 25},
+    {"name": "Bob", "category": "B", "age": 30},
+    {"name": "Charlie", "category": "A", "age": 35},
+    {"name": "Dave", "category": "C", "age": 40},
+]
+
+columns = ["name", "category", "age"]
+
+@app.route('/test', methods=['GET', 'POST'])
 def test():
-    return render_template('test.html')
+    """
+    Handle the '/test' route for both GET and POST requests.
+
+    For GET requests, it renders the 'test.html' template with all columns and data
+    For POST requests, it filters the data based on the selected columns from the form
+
+    Returns:
+        Rendered HTML template with filtered data and columns.
+    """
+    # Get the list of selected columns from the form data
+    selected_columns = request.form.getlist('columns')
+
+    # If no columns are selected, use all columns
+    if not selected_columns:
+        selected_columns = columns
+
+    # Filter the data based on the selected columns
+    filtered_data = [
+        {key: item[key] for key in selected_columns if key in item} for item in test_data
+    ]
+
+    return render_template(
+        'test.html', data=filtered_data,
+        columns=columns, selected_columns=selected_columns)
+
+
+@app.route('/main_test', methods=['GET', 'POST'])
+def main_test():
+    """
+    Handle the '/main_test' route for both GET and POST requests.
+
+    For GET requests, it renders the 'main_test.html' template with all columns and data
+    For POST requests, it filters the data based on the selected columns from the form
+
+    Returns:
+        Rendered HTML template with filtered data and columns.
+    """
+    main_data = fetch_all_data_v2()
+
+    # Get the list of selected columns from the form data
+    selected_columns = request.form.getlist('columns')
+
+    # If no columns are selected, use all columns
+    if not selected_columns:
+        selected_columns = fields
+
+    # Filter the data based on the selected columns
+    filtered_data = [
+        {key: item[key] for key in selected_columns if key in item} for item in main_data
+    ]
+
+    return render_template(
+        'main_test.html', data=filtered_data,
+        columns=fields, selected_columns=selected_columns)
 
 
 if __name__ == '__main__':
