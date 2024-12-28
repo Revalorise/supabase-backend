@@ -13,5 +13,10 @@ def hello_world():
         email=data[4], type=data[5], m_name=data[6], success=data[7])
 
 
+@app.route('/test')
+def test():
+    return render_template('test.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
