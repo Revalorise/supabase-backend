@@ -1,13 +1,16 @@
 import csv
 import json
 import os
-from dotenv import load_dotenv
+import yaml
+
 from supabase import create_client, Client
 
-load_dotenv()
 
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
+with open('config.yaml') as file:
+    config = yaml.safe_load(file)
+
+url: str = config.get('supabase_url')
+key: str = config.get('supabase_key')
 supabase: Client = create_client(url, key)
 
 sample_data = supabase.table('users').select("*").execute().model_dump_json(indent=4)
