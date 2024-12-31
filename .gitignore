@@ -1,6 +1,6 @@
 backend/.venv
 backend/.env
-backend/config.json
+backend/config.yaml
 .idea
 
 frontend/bootstrap-5.3.3-examples
