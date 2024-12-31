@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtered Data</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Data Filtering with Checkboxes</h1>
+
+    <form id="filter-form" method="post">
+        <div>
+            <h3>Select Columns to Display:</h3>
+            {% for column in columns %}
+                <label>
+                    <input type="checkbox" name="columns" value="{{ column }}"
+                            {% if column in selected_columns %} checked {% endif %}>
+                    {{ column }}
+                </label><br>
+            {% endfor %}
+        </div>
+        <input type="submit" value="Apply Filters">
+    </form>
+
+    <h3>Filtered Data:</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                {% for column in selected_columns %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody id="data-list">
+            {% for row in data %}
+                <tr>
+                    {% for column in selected_columns %}
+                        <td>{{ row[column] }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        $("#filter-form").on("submit", function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: "/test",
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (response) {
+                    $("body").html(response);
+                }
+            });
+        });
+    </script>
+</body>

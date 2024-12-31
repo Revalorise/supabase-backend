@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 from dotenv import load_dotenv
@@ -10,7 +11,7 @@ key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 sample_data = supabase.table('users').select("*").execute().model_dump_json(indent=4)
-print(sample_data)
+# print(sample_data)
 file = json.loads(sample_data)
 # print(file.get('data')[0].get('id'))
 fields = ['id', 'created_at', 'mac', 'amount', 'email', 'type', 'm_name', 'success']
@@ -26,7 +27,21 @@ def fetch_all_data():
 
 
 test = fetch_all_data()
-print(test)
+data = json.dumps(file.get('data'), indent=4)
+
+def json_to_csv(json_data, csv_file_path):
+    data = json.loads(json_data)
+    with open(csv_file_path, mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=data[0].keys())
+        writer.writeheader()
+        writer.writerows(data)
+
+# Call the function to export data
+# json_to_csv(data, 'sample_data.csv')
+
+
+def fetch_all_data_v2():
+    return file.get('data')
 
 """
 data = {field: [] for field in fields}

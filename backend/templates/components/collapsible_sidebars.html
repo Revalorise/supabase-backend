@@ -1,12 +1,12 @@
 <div class="d-flex">
     <div class="flex-shrink-0 p-3" style="width: 280px;">
-        <a href="/" class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom">
+        <a href="/backend/static" class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom">
             <span class="fs-5 fw-semibold">Filter</span>
         </a>
         <ul class="list-unstyled ps-0">
             <li class="mb-1 px-5">
                 <div class="collapse show" id="home-collapse">
-                    <form action="/">
+                    <form action="/backend/static">
                         {% for field in data %}
                         <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
                         <label for="vehicle1">{{ field }}</label><br>

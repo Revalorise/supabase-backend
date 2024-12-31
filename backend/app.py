@@ -1,8 +1,20 @@
-from flask import Flask, render_template, request
-from supabase_connect import fetch_all_data, get_filtered_data, fetch_all_data_v2
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for
+from flask_cors import CORS
+from supabase_connect import fetch_all_data, fetch_all_data_v2
+
+from routes.auth import auth_bp
+from routes.api import api_bp
+
+import plotly.express as px
+import plotly.io as pio
 
 app = Flask(__name__)
+app.secret_key = 'blackball007'
+CORS(app)
 # flask --app app run --debug
+
+app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(api_bp, url_prefix='/api')
 
 fields = ['id', 'created_at', 'mac', 'amount', 'email', 'type', 'm_name', 'success']
 
@@ -97,9 +109,51 @@ def main_test():
         {key: item[key] for key in selected_columns if key in item} for item in main_data
     ]
 
+    # Example data
+    data = px.data.stocks()
+
+    # Create a Plotly line graph
+    fig = px.line(data,
+                  x='date', y=['GOOG', 'AAPL', 'AMZN', 'FB', 'NFLX', 'MSFT'],
+                  title='Stock Prices Over Time')
+
+    # Customize the appearance
+    fig.update_layout(
+        title='Stock Prices Over Time',
+        template='plotly_dark',
+        title_font=dict(size=24, family='Courier', color='Orange'),
+        xaxis=dict(title='[Date]', showgrid=True, gridwidth=1, gridcolor='LightGray'),
+        yaxis=dict(title='[Price]', showgrid=True, gridwidth=1, gridcolor='LightGray'),
+        legend=dict(title='[Stock]', orientation='h', y=1.1, x=0.5, font=dict(size=14)),
+    )
+
+    # Convert the Plotly figure to HTML
+    plot_html = pio.to_html(fig, full_html=False)
+
     return render_template(
-        'main_test.html', data=filtered_data,
-        columns=fields, selected_columns=selected_columns)
+            'main_test.html', data=filtered_data,
+            columns=fields, selected_columns=selected_columns,
+            plot_html=plot_html)
+
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    """
+    Handle the '/login' route for both GET and POST requests.
+
+    For GET requests, it renders the 'login.html' template
+    For POST requests, it retrieves the username and password from the form data
+
+    Returns:
+        Rendered HTML template with the username and password.
+    """
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    if username == 'admin' and password == 'admin':
+        return redirect(url_for('main_test'))
+    return jsonify({'message': 'Invalid credentials!'}), 401
 
 
 if __name__ == '__main__':

@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "web-vitals": "^4.2.4"
+  },
+  "dependencies": {
+    "axios": "^1.7.9"
+  }
+}
